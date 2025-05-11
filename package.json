@@ -12,5 +12,14 @@
   "packageManager": "pnpm@10.6.2",
   "devDependencies": {
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.1",
+    "aws-sdk": "^2.1692.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "redis": "^5.0.1",
+    "simple-git": "^3.27.0"
   }
 }
