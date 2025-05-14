@@ -1,14 +1,17 @@
 import express from "express";
 import cors from "cors";
+import simpleGit from "simple-git";
+import { generate_id } from "./utils";
 
 const app = express();
 app.use(cors());
-app.use(express.json())
+app.use(express.json());
 
-app.get("/repo-url", (req, res) => {
+app.get("/deploy",async (req, res) => {
   const repoUrl = req.body.repoUrl;
-  console.log("Received repo URL:", repoUrl);
-  res.json({});
+  const id = generate_id();
+  await simpleGit().clone(repoUrl, `output/${id}`);
+  res.json({id});
 });
 
 app.listen(3000);
