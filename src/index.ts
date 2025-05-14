@@ -17,7 +17,7 @@ app.get("/deploy", async (req, res) => {
   const files = getAllFiles(path.join(__dirname, `output/${id}`));
 
 
-  res.json({ files });
+  res.json({ id });
 });
 
 app.listen(3000);
