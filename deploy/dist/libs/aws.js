@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadFromS3 = void 0;
+exports.uploadFinalDistToS3 = exports.downloadFromS3 = void 0;
 const aws_sdk_1 = require("aws-sdk");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
@@ -49,7 +49,9 @@ const downloadFromS3 = (folderPath) => __awaiter(void 0, void 0, void 0, functio
             s3.getObject({
                 Bucket: process.env.AWS_BUCKET,
                 Key: Key,
-            }).createReadStream().pipe(file)
+            })
+                .createReadStream()
+                .pipe(file)
                 .on("finish", () => {
                 resolve("");
             });
@@ -59,3 +61,37 @@ const downloadFromS3 = (folderPath) => __awaiter(void 0, void 0, void 0, functio
     yield Promise.all(allPromises === null || allPromises === void 0 ? void 0 : allPromises.filter((x) => x != undefined));
 });
 exports.downloadFromS3 = downloadFromS3;
+const getAllFiles = (repoPath) => {
+    let response = [];
+    const allFileAndFolderPath = fs_1.default.readdirSync(repoPath);
+    allFileAndFolderPath.forEach((fileOrFolder) => {
+        const fileOrFolderPath = path_1.default.join(repoPath, fileOrFolder);
+        const isDirectory = fs_1.default.statSync(fileOrFolderPath).isDirectory();
+        if (isDirectory) {
+            response = [...response, ...getAllFiles(fileOrFolderPath)];
+        }
+        else {
+            response.push(fileOrFolderPath);
+        }
+    });
+    return response;
+};
+const uploadFile = (fileName, localFilePath) => __awaiter(void 0, void 0, void 0, function* () {
+    const fileContent = fs_1.default.readFileSync(localFilePath);
+    const response = yield s3
+        .upload({
+        Body: fileContent,
+        Bucket: process.env.AWS_BUCKET,
+        Key: fileName,
+    })
+        .promise();
+    console.log("File uploaded successfully", response);
+});
+const uploadFinalDistToS3 = (id) => {
+    const distPath = path_1.default.join(__dirname, `output/${id}/dist`);
+    const allFiles = getAllFiles(distPath);
+    allFiles.forEach((file) => {
+        uploadFile(`dist/${id}/` + file.slice(distPath.length + 1), file);
+    });
+};
+exports.uploadFinalDistToS3 = uploadFinalDistToS3;

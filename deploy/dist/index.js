@@ -22,6 +22,7 @@ function main() {
                 const id = response.element;
                 yield (0, aws_1.downloadFromS3)(`output/${id}`);
                 yield (0, build_1.buildProject)(id);
+                yield (0, aws_1.uploadFinalDistToS3)(id);
             }
         }
     });
