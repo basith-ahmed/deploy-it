@@ -3,7 +3,8 @@ import cors from "cors";
 import simpleGit from "simple-git";
 import path from "path";
 import { generate_id } from "./libs/id";
-import getAllFiles from "./libs/files";
+import { getAllFiles } from "./libs/files";
+import { uploadFile } from "./libs/aws";
 
 const app = express();
 app.use(cors());
@@ -16,8 +17,11 @@ app.get("/deploy", async (req, res) => {
 
   const files = getAllFiles(path.join(__dirname, `output/${id}`));
 
+  files.forEach(async (file) => {
+    await uploadFile(file.slice(__dirname.length + 1), file);
+  });
 
-  res.json({ id });
+  res.json({ id: id });
 });
 
 app.listen(3000);

@@ -17,7 +17,8 @@ const cors_1 = __importDefault(require("cors"));
 const simple_git_1 = __importDefault(require("simple-git"));
 const path_1 = __importDefault(require("path"));
 const id_1 = require("./libs/id");
-const files_1 = __importDefault(require("./libs/files"));
+const files_1 = require("./libs/files");
+const aws_1 = require("./libs/aws");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
@@ -25,7 +26,10 @@ app.get("/deploy", (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const repoUrl = req.body.repoUrl;
     const id = (0, id_1.generate_id)();
     yield (0, simple_git_1.default)().clone(repoUrl, path_1.default.join(__dirname, `output/${id}`));
-    const files = (0, files_1.default)(path_1.default.join(__dirname, `output/${id}`));
-    res.json({ files });
+    const files = (0, files_1.getAllFiles)(path_1.default.join(__dirname, `output/${id}`));
+    files.forEach((file) => __awaiter(void 0, void 0, void 0, function* () {
+        yield (0, aws_1.uploadFile)(file.slice(__dirname.length + 1), file);
+    }));
+    res.json({ id: id });
 }));
 app.listen(3000);

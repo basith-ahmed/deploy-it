@@ -20,4 +20,4 @@ const getAllFiles = (repoPath: string) => {
   return response;
 };
 
-export default getAllFiles;
+export { getAllFiles };
