@@ -10,7 +10,6 @@ const s3 = new S3({
 
 // downloadFromS3: downloads all files from a folder in S3 to the local machine
 const downloadFromS3 = async (folderPath: string) => {
-
   // allFiles: is an array of all files in the folder ${path}
   const allFiles = await s3
     .listObjectsV2({
@@ -22,7 +21,6 @@ const downloadFromS3 = async (folderPath: string) => {
   // allfiles.Contents: is an array of all file names in the folder ${path}
   const allPromises =
     allFiles.Contents?.map(async ({ Key }) => {
-
       // promise to download each file
       return new Promise(async (resolve) => {
         if (!Key) {
@@ -41,7 +39,9 @@ const downloadFromS3 = async (folderPath: string) => {
         s3.getObject({
           Bucket: process.env.AWS_BUCKET!,
           Key: Key!,
-        }).createReadStream().pipe(file)
+        })
+          .createReadStream()
+          .pipe(file)
           .on("finish", () => {
             resolve("");
           });
@@ -51,4 +51,43 @@ const downloadFromS3 = async (folderPath: string) => {
   // wait for all promises to resolve
   await Promise.all(allPromises?.filter((x) => x != undefined));
 };
-export { downloadFromS3 };
+
+const getAllFiles = (repoPath: string) => {
+  let response: string[] = [];
+
+  const allFileAndFolderPath = fs.readdirSync(repoPath);
+
+  allFileAndFolderPath.forEach((fileOrFolder) => {
+    const fileOrFolderPath = path.join(repoPath, fileOrFolder);
+    const isDirectory = fs.statSync(fileOrFolderPath).isDirectory();
+
+    if (isDirectory) {
+      response = [...response, ...getAllFiles(fileOrFolderPath)];
+    } else {
+      response.push(fileOrFolderPath);
+    }
+  });
+
+  return response;
+};
+
+const uploadFile = async (fileName: string, localFilePath: string) => {
+  const fileContent = fs.readFileSync(localFilePath);
+  const response = await s3
+    .upload({
+      Body: fileContent,
+      Bucket: process.env.AWS_BUCKET!,
+      Key: fileName,
+    })
+    .promise();
+  console.log("File uploaded successfully", response);
+};
+
+const uploadFinalDistToS3 = (id: string) => {
+  const distPath = path.join(__dirname, `output/${id}/dist`);
+  const allFiles = getAllFiles(distPath);
+  allFiles.forEach((file) => {
+    uploadFile(`dist/${id}/` + file.slice(distPath.length + 1), file);
+  });
+};
+export { downloadFromS3, uploadFinalDistToS3 };
