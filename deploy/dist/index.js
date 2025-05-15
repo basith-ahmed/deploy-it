@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const redis_1 = require("redis");
 const aws_1 = require("./libs/aws");
+const build_1 = require("./libs/build");
 const subscriber = (0, redis_1.createClient)(); //machine localhost
 subscriber.connect();
 function main() {
@@ -20,6 +21,7 @@ function main() {
             if (response) {
                 const id = response.element;
                 yield (0, aws_1.downloadFromS3)(`output/${id}`);
+                yield (0, build_1.buildProject)(id);
             }
         }
     });

@@ -1,5 +1,6 @@
 import { createClient } from "redis";
 import { downloadFromS3 } from "./libs/aws";
+import { buildProject } from "./libs/build";
 
 const subscriber = createClient(); //machine localhost
 subscriber.connect();
@@ -10,6 +11,7 @@ async function main() {
     if (response) {
       const id = response.element;
       await downloadFromS3(`output/${id}`);
+      await buildProject(id);
     }
   }
 }

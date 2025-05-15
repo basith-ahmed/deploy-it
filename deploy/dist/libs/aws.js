@@ -21,6 +21,7 @@ const s3 = new aws_sdk_1.S3({
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     endpoint: process.env.AWS_ENDPOINT,
 });
+// downloadFromS3: downloads all files from a folder in S3 to the local machine
 const downloadFromS3 = (folderPath) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     // allFiles: is an array of all files in the folder ${path}
@@ -49,7 +50,7 @@ const downloadFromS3 = (folderPath) => __awaiter(void 0, void 0, void 0, functio
                 Bucket: process.env.AWS_BUCKET,
                 Key: Key,
             }).createReadStream().pipe(file)
-                .on("end", () => {
+                .on("finish", () => {
                 resolve("");
             });
         }));
