@@ -9,12 +9,12 @@ const s3 = new S3({
 });
 
 // downloadFromS3: downloads all files from a folder in S3 to the local machine
-const downloadFromS3 = async (folderPath: string) => {
+const downloadFromS3 = async (id: string) => {
   // allFiles: is an array of all files in the folder ${path}
   const allFiles = await s3
     .listObjectsV2({
       Bucket: process.env.AWS_BUCKET!,
-      Prefix: folderPath,
+      Prefix: `output/${id}`,
     })
     .promise();
 
@@ -23,13 +23,15 @@ const downloadFromS3 = async (folderPath: string) => {
     allFiles.Contents?.map(async ({ Key }) => {
       // promise to download each file
       return new Promise(async (resolve) => {
+
         if (!Key) {
           resolve("");
           return;
         }
         const finalPath = path.join(__dirname, Key);
+        // Key: is the name of the file in S3
+        // finalPath: is the path where the file will be saved (/dirname/Key)
 
-        // create the dir if !exists
         const dirName = path.dirname(finalPath);
         if (!fs.existsSync(dirName)) {
           fs.mkdirSync(dirName, { recursive: true });
@@ -48,7 +50,7 @@ const downloadFromS3 = async (folderPath: string) => {
       });
     }) || [];
 
-  // wait for all promises to resolve
+  // wait for all promises to resolve (wait for all files to be downloaded)
   await Promise.all(allPromises?.filter((x) => x != undefined));
 };
 

@@ -15,7 +15,7 @@ async function main() {
       const id = response.element;
 
       publisher.hSet("status", id, "building");
-      await downloadFromS3(`output/${id}`);
+      await downloadFromS3(id);
       await buildProject(id);
       await uploadFinalDistToS3(id);
       publisher.hSet("status", id, "deployed")
