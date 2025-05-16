@@ -17,6 +17,10 @@ app.use(express.json());
 app.get("/deploy", async (req, res) => {
   const repoUrl = req.body.repoUrl;
   const id = generate_id();
+
+  // temp redis as db to store status
+  publisher.hSet("status", id, "uploading");
+
   await simpleGit().clone(repoUrl, path.join(__dirname, `output/${id}`));
 
   const files = getAllFiles(path.join(__dirname, `output/${id}`));
@@ -26,6 +30,7 @@ app.get("/deploy", async (req, res) => {
   });
 
   publisher.lPush("build-queue", id);
+  publisher.hSet("status", id, "uploaded");
 
   res.json({ id: id });
 });

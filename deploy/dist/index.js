@@ -14,15 +14,19 @@ const aws_1 = require("./libs/aws");
 const build_1 = require("./libs/build");
 const subscriber = (0, redis_1.createClient)(); //machine localhost
 subscriber.connect();
+const publisher = (0, redis_1.createClient)();
+publisher.connect();
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
         while (1) {
             const response = yield subscriber.brPop("build-queue", 0);
             if (response) {
                 const id = response.element;
+                publisher.hSet("status", id, "building");
                 yield (0, aws_1.downloadFromS3)(`output/${id}`);
                 yield (0, build_1.buildProject)(id);
                 yield (0, aws_1.uploadFinalDistToS3)(id);
+                publisher.hSet("status", id, "built");
             }
         }
     });
