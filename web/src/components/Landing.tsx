@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { Github, Globe, LoaderIcon } from "lucide-react";
+import { ShineBorder } from "./ui/ShineBorder";
+import { cn } from "../lib/utils";
 
 const BACKEND_UPLOAD_URL = "http://localhost:3000";
 
@@ -36,20 +38,21 @@ export function Landing() {
     }, 2000);
   };
 
-  const bgColor = () => {
+  const bgColor = (): string => {
     switch (statusText) {
       case "uploading":
-        return "bg-yellow-500";
+        return "#facc15"; // yellow-500
       case "building":
-        return "bg-blue-500";
+        return "#3b82f6"; // blue-500
       case "deployed":
-        return "bg-green-500";
+        return "#22c55e"; // green-500
       case "error":
-        return "bg-red-500";
+        return "#ef4444"; // red-500
       default:
-        return "bg-gray-300";
+        return "#d1d5db"; // gray-300
     }
   };
+  
 
   const [owner, repoName] = repoUrl.replace(/\/$/, "").split("/").slice(-2);
 
@@ -58,13 +61,23 @@ export function Landing() {
       <div
         className={`${
           initiated ? "w-1/2 border-r-2 border-white/20" : "w-full"
-        } h-screen flex flex-col justify-center items-center transition-width duration-700`}
+        } h-screen flex flex-col justify-center items-center transition-width duration-700 relative overflow-hidden`}
       >
-        <h1 className="text-8xl font-semibold bg-gradient-to-b from-white to-gray-400 text-transparent bg-clip-text mb-2">
+        <div
+          className={cn(
+            "absolute inset-0",
+            "[background-size:20px_20px]",
+            "[background-image:radial-gradient(#d4d4d4_1px,transparent_1px)]",
+            "dark:[background-image:radial-gradient(#404040_1px,transparent_1px)]"
+          )}
+        />
+        {/* Radial gradient for the container to give a faded look */}
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black"></div>
+        <h1 className="text-8xl font-semibold bg-gradient-to-b from-white to-gray-400 text-transparent bg-clip-text mb-2 z-20">
           Deploy It.
         </h1>
 
-        <div className="max-w-sm w-full">
+        <div className="max-w-sm w-full z-20">
           <header className="mb-4 text-center">
             {/* <p>Enter the URL of your GitHub repository</p> */}
           </header>
@@ -95,8 +108,10 @@ export function Landing() {
         } h-screen bg-[#0a0a0a] flex flex-col justify-center items-center overflow-hidden transition-width duration-700 p-6`}
       >
         {initiated && (
-          <div className="border border-white/20 p-6 sm:p-8 rounded-2xl w-full max-w-md space-y-6 bg-[#0f0f0f]">
-            <div className="flex items-center justify-between">
+          <div className="border border-white/20 p-6 sm:p-8 rounded-2xl w-full max-w-md bg-[#0f0f0f] relative overflow-hidden">
+            <ShineBorder shineColor={bgColor()} />
+
+            <div className="flex items-center justify-between mb-4 z-20">
               <h2 className="text-xl sm:text-2xl font-semibold text-white">
                 Deployment Status
               </h2>
@@ -107,7 +122,7 @@ export function Landing() {
               )}
             </div>
 
-            <div className="bg-[#1a1a1a] border border-white/10 p-4 rounded-xl flex items-center gap-4">
+            <div className="bg-[#1a1a1a] border border-white/10 p-4 rounded-xl flex items-center gap-4 mb-4">
               <Github className="w-5 h-5 text-white" />
               <div>
                 <p className="font-medium text-white">{repoName}</p>
@@ -116,7 +131,8 @@ export function Landing() {
             </div>
 
             <div
-              className={`${bgColor()} text-white text-sm sm:text-base px-4 py-2 rounded-lg text-center`}
+              className="text-white text-sm sm:text-base px-4 py-2 rounded-lg text-center mb-4"
+              style={{ backgroundColor: bgColor() }}
             >
               {statusText}
             </div>
