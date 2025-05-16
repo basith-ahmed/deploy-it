@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { Github, Globe } from "lucide-react";
+import { Github, Globe, LoaderIcon } from "lucide-react";
 
 const BACKEND_UPLOAD_URL = "http://localhost:3000";
 
@@ -58,14 +58,15 @@ export function Landing() {
       <div
         className={`${
           initiated ? "w-1/2 border-r-2 border-white/20" : "w-full"
-        } h-screen flex flex-col justify-center items-center transition-width duration-500`}
+        } h-screen flex flex-col justify-center items-center transition-width duration-700`}
       >
+        <h1 className="text-8xl font-semibold bg-gradient-to-b from-white to-gray-400 text-transparent bg-clip-text mb-2">
+          Deploy It.
+        </h1>
+
         <div className="max-w-sm w-full">
-          <header className="mb-4">
-            <h1 className="text-2xl font-semibold">
-              Deploy your GitHub Repository
-            </h1>
-            <p>Enter the URL of your GitHub repository</p>
+          <header className="mb-4 text-center">
+            {/* <p>Enter the URL of your GitHub repository</p> */}
           </header>
           <div className="space-y-4">
             <input
@@ -74,13 +75,13 @@ export function Landing() {
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
               placeholder="https://github.com/username/repo"
-              className="w-full border border-gray-300 bg-[#ededed] px-3 py-2 text-black rounded-md"
+              className="w-full bg-[#1a1a1a] border border-white/10 px-3 py-2 rounded-md text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent"
             />
             {!uploading && (
               <button
                 onClick={handleDeploy}
                 disabled={!isValid || uploading}
-                className="w-full bg-[#ededed] px-4 py-2 text-black rounded-md"
+                className="w-full bg-[#ededed] px-4 py-2 text-black rounded-md font-semibold"
               >
                 Deploy
               </button>
@@ -91,66 +92,43 @@ export function Landing() {
       <div
         className={`${
           initiated ? "w-1/2" : "w-0"
-        } h-screen bg-[#0a0a0a] flex flex-col justify-center items-center overflow-hidden transition-width duration-500 p-6`}
+        } h-screen bg-[#0a0a0a] flex flex-col justify-center items-center overflow-hidden transition-width duration-700 p-6`}
       >
         {initiated && (
-          <div className="border border-white/20 p-8  rounded-xl w-full max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-semibold">Deployment Status</h2>
+          <div className="border border-white/20 p-6 sm:p-8 rounded-2xl w-full max-w-md space-y-6 bg-[#0f0f0f]">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl sm:text-2xl font-semibold text-white">
+                Deployment Status
+              </h2>
               {!deployed && (
-                <div className="animate-spin">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    className="lucide lucide-loader-icon lucide-loader"
-                  >
-                    <path d="M12 2v4" />
-                    <path d="m16.2 7.8 2.9-2.9" />
-                    <path d="M18 12h4" />
-                    <path d="m16.2 16.2 2.9 2.9" />
-                    <path d="M12 18v4" />
-                    <path d="m4.9 19.1 2.9-2.9" />
-                    <path d="M2 12h4" />
-                    <path d="m4.9 4.9 2.9 2.9" />
-                  </svg>
+                <div className="animate-spin text-white">
+                  <LoaderIcon className="w-5 h-5" />
                 </div>
               )}
             </div>
 
-            {initiated && (
-              <div className="bg-[#1a1a1a] border border-white/10 p-4 rounded-xl w-full max-w-sm mb-4 flex items-center space-x-4">
-                <Github />
-                <div>
-                  <p className="font-semibold">{repoName}</p>
-                  <p className="text-sm text-gray-400">{owner}</p>
-                </div>
+            <div className="bg-[#1a1a1a] border border-white/10 p-4 rounded-xl flex items-center gap-4">
+              <Github className="w-5 h-5 text-white" />
+              <div>
+                <p className="font-medium text-white">{repoName}</p>
+                <p className="text-sm text-gray-400">{owner}</p>
               </div>
-            )}
+            </div>
 
-            {initiated && (
-              <div
-                className={`${bgColor()} text-white px-4 py-2 rounded-lg mb-4 text-center`}
-              >
-                {statusText}
-              </div>
-            )}
+            <div
+              className={`${bgColor()} text-white text-sm sm:text-base px-4 py-2 rounded-lg text-center`}
+            >
+              {statusText}
+            </div>
 
-            {initiated && (
-              <a
-                href={`http://${uploadId}.localhost:3001/index.html`}
-                target="_blank"
-                className="text-black w-full flex items-center justify-center bg-[#ededed] p-2 rounded-lg"
-              >
-                Visit site <Globe className="h-4 w-4"/>
-              </a>
-            )}
+            <a
+              href={`http://${uploadId}.localhost:3001/index.html`}
+              target="_blank"
+              className="inline-flex items-center justify-center gap-2 w-full px-4 py-2.5 rounded-xl bg-white text-black font-medium hover:bg-gray-100 transition"
+            >
+              Visit Site
+              <Globe className="w-4 h-4" />
+            </a>
           </div>
         )}
       </div>
