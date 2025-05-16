@@ -10,11 +10,14 @@ import { createClient } from "redis";
 const publisher = createClient();
 publisher.connect();
 
+const subscriber = createClient();
+subscriber.connect();
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/deploy", async (req, res) => {
+app.get("/upload", async (req, res) => {
   const repoUrl = req.body.repoUrl;
   const id = generate_id();
 
@@ -34,5 +37,12 @@ app.get("/deploy", async (req, res) => {
 
   res.json({ id: id });
 });
+
+app.get("/status/:id", async (req, res) => {
+  const id  = req.params.id;
+  const status = await subscriber.hGet("status", id as string);
+
+  res.json({ status: status });
+})
 
 app.listen(3000);

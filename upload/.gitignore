@@ -3,4 +3,4 @@
 *.tsbuildinfo
 
 /output
-/dist/output
+/dist
